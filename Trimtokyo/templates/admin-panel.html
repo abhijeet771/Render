@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard - Barber Delivery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function toggleNotifications() {
+      document.getElementById('notifDropdown').classList.toggle('hidden');
+    }
+  </script>
+</head>
+<body class="bg-gray-100 flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 h-screen bg-white shadow-md p-4">
+    <h2 class="text-2xl font-bold mb-6 text-center">🛠 Admin Panel</h2>
+    <nav class="space-y-4">
+      <a href="#" class="block text-gray-700 hover:text-blue-600">📊 Dashboard</a>
+      <a href="#" class="block text-gray-700 hover:text-blue-600">👥 Manage Users</a>
+      <a href="#" class="block text-gray-700 hover:text-blue-600">💈 Manage Barbers</a>
+      <a href="#" class="block text-gray-700 hover:text-blue-600">📅 All Bookings</a>
+      <a href="#" class="block text-red-600 hover:text-red-800">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-6">
+    <!-- Top Bar -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">👋 Welcome, Admin!</h1>
+      <div class="relative">
+        <button onclick="toggleNotifications()" class="text-gray-700 focus:outline-none">
+          🔔
+        </button>
+        <div id="notifDropdown" class="absolute right-0 mt-2 w-60 bg-white border rounded shadow-lg hidden">
+          <div class="p-4 text-sm">
+            <p class="font-semibold mb-2">Notifications</p>
+            <ul class="space-y-1">
+              <li>🔧 New barber registration request</li>
+              <li>📢 System check completed</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white p-4 rounded shadow text-center">
+        <p class="text-sm text-gray-500">Total Users</p>
+        <p class="text-2xl font-bold text-blue-600">1,240</p>
+      </div>
+      <div class="bg-white p-4 rounded shadow text-center">
+        <p class="text-sm text-gray-500">Registered Barbers</p>
+        <p class="text-2xl font-bold text-green-600">87</p>
+      </div>
+      <div class="bg-white p-4 rounded shadow text-center">
+        <p class="text-sm text-gray-500">Total Bookings</p>
+        <p class="text-2xl font-bold text-purple-600">3,605</p>
+      </div>
+    </div>
+
+    <!-- Recent Bookings Table -->
+    <div class="bg-white p-6 rounded shadow">
+      <h2 class="text-xl font-semibold mb-4">📋 Recent Bookings</h2>
+      <table class="w-full table-auto">
+        <thead>
+          <tr class="bg-gray-200 text-left">
+            <th class="p-2">User</th>
+            <th class="p-2">Service</th>
+            <th class="p-2">Barber</th>
+            <th class="p-2">Status</th>
+            <th class="p-2">Date</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          <tr class="border-b">
+            <td class="p-2">Ravi Kumar</td>
+            <td class="p-2">Haircut</td>
+            <td class="p-2">Amit Verma</td>
+            <td class="p-2 text-green-600 font-semibold">Completed</td>
+            <td class="p-2">2025-07-21</td>
+          </tr>
+          <tr class="border-b">
+            <td class="p-2">Nina Patel</td>
+            <td class="p-2">Hair + Massage</td>
+            <td class="p-2">Mohit Sharma</td>
+            <td class="p-2 text-yellow-600 font-semibold">Pending</td>
+            <td class="p-2">2025-07-22</td>
+          </tr>
+          <tr>
+            <td class="p-2">Zaid Shaikh</td>
+            <td class="p-2">Shave</td>
+            <td class="p-2">Sameer Khan</td>
+            <td class="p-2 text-blue-600 font-semibold">On the Way</td>
+            <td class="p-2">2025-07-23</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+</body>
+</html>

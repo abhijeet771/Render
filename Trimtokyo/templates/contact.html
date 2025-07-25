@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barber Delivery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- 🧭 Navbar -->
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+      <h1 class="text-2xl font-bold text-blue-700">BarberX</h1>
+      <nav class="space-x-4 hidden md:block">
+        <a href="index.html" class="hover:text-blue-600 font-medium">Home</a>
+        <a href="services.html" class="hover:text-blue-600 font-medium">Services</a>
+        <a href="contact.html" class="text-blue-600 font-semibold underline">Contact</a>
+      </nav>
+      <div class="md:hidden">
+        <button class="text-blue-700 text-2xl">&#9776;</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 📞 Contact Support Section -->
+  <section class="py-16 px-6">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-4xl font-bold mb-6">Contact Support</h2>
+      <p class="text-gray-600 mb-8">Need help or have questions? Fill out the form below and we'll get back to you soon!</p>
+
+      <form id="contactForm" class="grid grid-cols-1 gap-6">
+        <input id="name" type="text" placeholder="Your Name" required class="px-4 py-3 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500"/>
+        <input id="email" type="email" placeholder="Your Email" required class="px-4 py-3 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500"/>
+        <textarea id="message" rows="5" placeholder="Your Message" required class="px-4 py-3 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500"></textarea>
+        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded font-semibold hover:bg-blue-700 transition">
+          Send Message
+        </button>
+      </form>
+
+      <p id="responseMessage" class="text-green-600 mt-4 font-semibold"></p>
+    </div>
+  </section>
+
+  <!-- 🌐 Social Media Section -->
+  <section class="bg-gray-100 py-12">
+    <h2 class="text-3xl font-bold text-center mb-6">Follow Us</h2>
+    <div class="flex justify-center gap-6 text-3xl text-blue-600">
+      <a href="#" class="hover:text-blue-800 transition" aria-label="Facebook">
+        <i class="fab fa-facebook"></i>
+      </a>
+      <a href="#" class="hover:text-pink-600 transition" aria-label="Instagram">
+        <i class="fab fa-instagram"></i>
+      </a>
+      <a href="#" class="hover:text-blue-400 transition" aria-label="Twitter">
+        <i class="fab fa-twitter"></i>
+      </a>
+      <a href="#" class="hover:text-blue-500 transition" aria-label="LinkedIn">
+        <i class="fab fa-linkedin"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- 🔚 Footer -->
+  <footer class="bg-gray-900 text-white py-6 text-center">
+    <p>&copy; 2025 BarberX. All Rights Reserved.</p>
+  </footer>
+
+  <!-- 📤 Send Form via JavaScript -->
+  <script>
+    const form = document.getElementById('contactForm');
+    const responseMsg = document.getElementById('responseMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        message: document.getElementById('message').value
+      };
+
+      try {
+        const response = await fetch('http://localhost:5000/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+          responseMsg.textContent = '✅ Message sent! Check your inbox.';
+          form.reset();
+        } else {
+          responseMsg.textContent = '❌ Something went wrong.';
+        }
+      } catch (error) {
+        responseMsg.textContent = '⚠️ Error sending request.';
+        console.error(error);
+      }
+    });
+  </script>
+
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

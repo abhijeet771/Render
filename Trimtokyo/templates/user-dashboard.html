@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function toggleNotifications() {
+      document.getElementById('notifDropdown').classList.toggle('hidden');
+    }
+  </script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA17UQLGwxdPj-o_HeUlNN1TOUiIJEqtbM",
+      authDomain: "barber-a7850.firebaseapp.com",
+      projectId: "barber-a7850",
+      storageBucket: "barber-a7850.firebasestorage.app",
+      messagingSenderId: "198586026416",
+      appId: "1:198586026416:web:26d8f4d4921b2e02feee75",
+      measurementId: "G-GWV62LBT2V"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+</head>
+
+<body class="bg-gray-100 flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 h-screen bg-white shadow-md p-4">
+    <h2 class="text-2xl font-bold mb-6 text-center">💈 Barber Delivery</h2>
+    <nav class="space-y-4">
+      <a href="#" class="block text-gray-700 hover:text-blue-600">🏠 Dashboard</a>
+      <a href="#" class="block text-gray-700 hover:text-blue-600">📋 My Bookings</a>
+      <a href="#" class="block text-gray-700 hover:text-blue-600">👤 Profile</a>
+      <a href="#" onclick="logout()" class="block text-red-600 hover:text-red-800">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-6">
+    <!-- Top Bar -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold" id="welcome-text">👋 Welcome!</h1>
+      <div class="relative">
+        <button onclick="toggleNotifications()" class="text-gray-700 focus:outline-none">🔔</button>
+        <div id="notifDropdown" class="absolute right-0 mt-2 w-60 bg-white border rounded shadow-lg hidden">
+          <div class="p-4 text-sm">
+            <p class="font-semibold mb-2">Notifications</p>
+            <ul class="space-y-1">
+              <li>📅 Your booking is confirmed!</li>
+              <li>✂️ New service added: Beard Trim</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookings -->
+    <section class="mb-6">
+      <h2 class="text-xl font-semibold mb-2">📅 Your Bookings</h2>
+      <div id="bookings" class="bg-white p-4 rounded shadow">
+        <p>Loading bookings...</p>
+      </div>
+    </section>
+
+    <!-- Profile -->
+    <section>
+      <h2 class="text-xl font-semibold mb-2">🧑 Profile</h2>
+      <div class="bg-white p-4 rounded shadow" id="profile-section">
+        <p><strong>Name:</strong> Loading...</p>
+        <p><strong>Email:</strong> Loading...</p>
+        <p><strong>Role:</strong> User</p>
+        <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Edit Profile</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Load data after login
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        document.getElementById('welcome-text').textContent = `👋 Welcome, ${user.email.split('@')[0]}!`;
+        document.getElementById('profile-section').innerHTML = `
+          <p><strong>Name:</strong> ${user.displayName || 'Not Set'}</p>
+          <p><strong>Email:</strong> ${user.email}</p>
+          <p><strong>Role:</strong> User</p>
+          <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Edit Profile</button>
+        `;
+
+        const bookingsDiv = document.getElementById('bookings');
+        db.collection("orders")
+          .where("userId", "==", user.uid)
+          .orderBy("date", "desc")
+          .get()
+          .then(snapshot => {
+            if (snapshot.empty) {
+              bookingsDiv.innerHTML = "<p>No bookings yet.</p>";
+            } else {
+              bookingsDiv.innerHTML = "";
+              snapshot.forEach(doc => {
+                const data = doc.data();
+                bookingsDiv.innerHTML += `
+                  <div class="mb-4 p-4 border rounded">
+                    <p><strong>Service:</strong> ${data.service}</p>
+                    <p><strong>Date:</strong> ${data.date}</p>
+                    <p><strong>Status:</strong> ${data.status}</p>
+                  </div>
+                `;
+              });
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching bookings:", error);
+            bookingsDiv.innerHTML = "<p>Error loading bookings.</p>";
+          });
+      }
+    });
+
+    // Logout
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = "login.html";
+      });
+    }
+  </script>
+
+</body>
+</html>

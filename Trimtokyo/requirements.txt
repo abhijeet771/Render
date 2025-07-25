@@ -1,0 +1,7 @@
+Flask
+Flask-Mail
+python-dotenv
+WeasyPrint
+gunicorn
+firebase-admin
+requests

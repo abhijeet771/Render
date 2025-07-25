@@ -1,0 +1,171 @@
+{% raw %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barber Delivery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA17UQLGwxdPj-o_HeUlNN1TOUiIJEqtbM",
+      authDomain: "barber-a7850.firebaseapp.com",
+      projectId: "barber-a7850",
+      storageBucket: "barber-a7850.firebasestorage.app",
+      messagingSenderId: "198586026416",
+      appId: "1:198586026416:web:26d8f4d4921b2e02feee75",
+      measurementId: "G-GWV62LBT2V"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+</head>
+
+<body class="bg-gray-100">
+<div id="user-info" class="text-right p-4 text-sm text-gray-600"></div>
+
+<nav class="flex items-center justify-between px-6 py-4 bg-white shadow">
+  <div class="text-2xl font-bold text-blue-600">BarberDelivery</div>
+  <ul class="hidden md:flex gap-6 text-gray-700 font-medium">
+    <li><a href="{{ url_for('index') }}" class="hover:text-blue-500">Home</a></li>
+    <li><a href="{{ url_for('services') }}" class="hover:text-blue-500">Services</a></li>
+    <li><a href="{{ url_for('contact') }}" class="hover:text-blue-500">Contact Us</a></li>
+  </ul>
+  <button class="md:hidden">
+    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+</nav>
+
+<section class="mb-6">
+  <h2 class="text-xl font-semibold mb-2">📅 Your Bookings</h2>
+  <div id="bookings-container" class="bg-white p-4 rounded shadow">
+    <p>Loading your bookings...</p>
+  </div>
+</section>
+
+<div class="flex justify-center mt-6 px-4">
+  <input type="text" placeholder="Search services..." 
+         class="w-full max-w-lg px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:border-blue-400" />
+</div>
+
+<section class="bg-gradient-to-br from-gray-900 to-black text-white py-20 px-6 relative overflow-hidden">
+  <div class="absolute top-0 left-0 w-full h-full z-0">
+    <div class="w-32 h-32 bg-blue-500 opacity-20 rounded-full absolute animate-ping top-10 left-20"></div>
+    <div class="w-24 h-24 bg-pink-400 opacity-20 rounded-full absolute animate-pulse top-40 right-24"></div>
+    <div class="w-40 h-40 bg-purple-500 opacity-10 rounded-full absolute animate-bounce bottom-10 left-40"></div>
+  </div>
+
+  <div class="max-w-5xl mx-auto text-center relative z-10 animate-fadein">
+    <h1 class="text-4xl md:text-6xl font-extrabold mb-4">Get Groomed, At Your Doorstep ✂️</h1>
+    <p class="text-lg md:text-xl text-gray-300 mb-8">
+      Premium haircuts & shaves by expert barbers. Delivered fast to your home!
+    </p>
+    <a href="{{ url_for('register') }}">
+      <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl text-lg shadow-lg transition duration-300 ease-in-out">
+        Book Now
+      </button>
+    </a>
+  </div>
+</section>
+
+<style>
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fadein {
+    animation: fadein 1.2s ease-out forwards;
+  }
+</style>
+
+<section class="px-6 py-8">
+  <h2 class="text-xl font-semibold mb-4 text-gray-700">Our Services</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    {% for i in range(1, 7) %}
+    <a href="{{ url_for('register') }}" class="block bg-white p-4 rounded-2xl shadow-md text-center hover:shadow-lg transition">
+      <img src="{{ url_for('static', filename='Facial-' + i|string + '.png') }}" alt="Service {{ i }}" class="w-full h-60 object-cover rounded-xl mb-2">
+      <p class="font-semibold text-gray-700">Service {{ i }}</p>
+    </a>
+    {% endfor %}
+
+  </div>
+</section>
+
+<div class="text-center mb-10">
+  <a href="{{ url_for('login') }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow hover:bg-blue-700 transition">
+    LOGIN
+  </a>
+</div>
+
+<section class="px-6 py-12 bg-white">
+  <h2 class="text-xl font-semibold mb-6 text-gray-700 text-center">What Our Customers Say</h2>
+  <div id="carousel" class="relative w-full max-w-3xl mx-auto overflow-hidden rounded-2xl shadow">
+    <div class="carousel-track transition-transform duration-700 ease-in-out flex">
+
+      <div class="min-w-full flex flex-col items-center p-6 bg-gray-50">
+        <img src="{{ url_for('static', filename='review1.jpg') }}" alt="Customer 1" class="w-24 h-24 rounded-full mb-4 object-cover">
+        <p class="text-center italic text-gray-600 max-w-md">"The barber arrived right on time and gave me the cleanest fade."</p>
+        <span class="mt-2 text-sm text-blue-500">– Rahul S., Delhi</span>
+      </div>
+
+      <div class="min-w-full flex flex-col items-center p-6 bg-gray-50">
+        <img src="{{ url_for('static', filename='customer2.jpg') }}" alt="Customer 2" class="w-24 h-24 rounded-full mb-4 object-cover">
+        <p class="text-center italic text-gray-600 max-w-md">"Loved the hygiene and professionalism. Booking was easy!"</p>
+        <span class="mt-2 text-sm text-blue-500">– Ayesha M., Mumbai</span>
+      </div>
+
+      <div class="min-w-full flex flex-col items-center p-6 bg-gray-50">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer 3" class="w-24 h-24 rounded-full mb-4 object-cover">
+        <p class="text-center italic text-gray-600 max-w-md">"Beard trim and massage – both amazing. Highly recommend!"</p>
+        <span class="mt-2 text-sm text-blue-500">– Karan D., Bengaluru</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="bg-gray-100 py-8">
+  <h2 class="text-xl font-semibold text-center text-gray-700 mb-4">Connect With Us</h2>
+  <div class="flex justify-center gap-6">
+    <a href="https://facebook.com" target="_blank" class="text-blue-600 hover:text-blue-800 text-2xl"><i class="fab fa-facebook"></i></a>
+    <a href="https://instagram.com" target="_blank" class="text-pink-500 hover:text-pink-700 text-2xl"><i class="fab fa-instagram"></i></a>
+    <a href="https://twitter.com" target="_blank" class="text-blue-400 hover:text-blue-600 text-2xl"><i class="fab fa-twitter"></i></a>
+    <a href="https://youtube.com" target="_blank" class="text-red-600 hover:text-red-800 text-2xl"><i class="fab fa-youtube"></i></a>
+  </div>
+</section>
+
+<script>
+  const track = document.querySelector('.carousel-track');
+  const totalSlides = track.children.length;
+  let index = 0;
+  setInterval(() => {
+    index = (index + 1) % totalSlides;
+    track.style.transform = `translateX(-${index * 100}%)`;
+  }, 4000);
+</script>
+
+<script>
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      const bookingsContainer = document.querySelector("#bookings-container");
+      bookingsContainer.innerHTML = "<p>Loading your bookings...</p>";
+
+      try {
+        const ordersRef = db.collection("orders").where("userId", "==", user.uid);
+        const snapshot = await ordersRef.get();
+
+        bookingsContainer.innerHTML = "";
+        if (snapshot.empty) {
+          bookingsContainer.innerHTML = "<p>No bookings found.</p>";
+        } else {
+          snapshot.forEach((doc) => {

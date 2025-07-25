@@ -1,0 +1,111 @@
+<!-- 🗺️ Map Section (Hidden by Default) -->
+<div id="map-section" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-xl p-4 max-w-4xl w-full relative">
+    <button onclick="closeMap()" class="absolute top-2 right-4 text-xl font-bold text-red-500">✖</button>
+    <h3 class="text-xl font-semibold mb-2">Available Locations</h3>
+    <div id="locations" class="mb-4 flex flex-wrap gap-2"></div>
+    <div id="map" style="height: 400px;"></div>
+  </div>
+</div>
+
+<!-- 🌍 Google Maps Script + Logic -->
+<script>
+  const serviceLocations = {
+    "Classic Haircut": [
+      { name: "Salon A", lat: 28.6139, lng: 77.2090 },
+      { name: "Salon B", lat: 28.5355, lng: 77.3910 },
+      { name: "Salon C", lat: 28.7041, lng: 77.1025 }
+    ],
+    // Add for other services if needed
+  };
+
+  let map, userMarker, directionsService, directionsRenderer, userPosition;
+
+  function showLocations(serviceName) {
+    const container = document.getElementById('locations');
+    const section = document.getElementById('map-section');
+    container.innerHTML = '';
+    section.classList.remove('hidden');
+
+    const locations = serviceLocations[serviceName];
+    locations.forEach(loc => {
+      const btn = document.createElement('button');
+      btn.innerText = loc.name;
+      btn.className = 'px-4 py-2 bg-blue-600 text-white rounded';
+      btn.onclick = () => showRouteTo(loc.lat, loc.lng);
+      container.appendChild(btn);
+    });
+
+    if (!map) {
+      initMap();
+    }
+  }
+
+  function initMap() {
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer();
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat: 28.61, lng: 77.23 },
+      zoom: 12,
+    });
+    directionsRenderer.setMap(map);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        userPosition = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+        userMarker = new google.maps.Marker({
+          position: userPosition,
+          map: map,
+          label: "You"
+        });
+        map.setCenter(userPosition);
+      },
+      () => alert("Could not get location.")
+    );
+  }
+
+  function showRouteTo(destLat, destLng) {
+    if (!userPosition) {
+      alert("User location not ready yet!");
+      return;
+    }
+
+    const request = {
+      origin: userPosition,
+      destination: { lat: destLat, lng: destLng },
+      travelMode: 'DRIVING',
+    };
+
+    directionsService.route(request, function (result, status) {
+      if (status == 'OK') {
+        directionsRenderer.setDirections(result);
+      } else {
+        alert("Could not get directions.");
+      }
+    });
+  }
+
+  function closeMap() {
+    document.getElementById('map-section').classList.add('hidden');
+    directionsRenderer.setDirections({ routes: [] }); // clear
+  }
+
+  // Add click handler for cards
+  document.querySelectorAll('.shadow-md').forEach(card => {
+    card.style.cursor = "pointer";
+    card.addEventListener('click', () => {
+      const title = card.querySelector('h3')?.innerText;
+      if (serviceLocations[title]) {
+        showLocations(title);
+      }
+    });
+  });
+</script>
+
+<!-- 🔑 Google Maps API -->
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBn9sL3_Ek8qcE9mFJE0OPzlBL6kF4oDC8&callback=initMap">
+</script>
