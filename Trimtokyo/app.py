@@ -1,13 +1,15 @@
 import os
-from flask import Flask, request, render_template_string, jsonify
+from flask import Flask, request, render_template, render_template_string, jsonify
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
 from weasyprint import HTML
+from flask_cors import CORS
 
 # Load environment variables
 load_dotenv("config.env")
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
+CORS(app)  # Optional: Allow cross-origin requests
 
 # Flask-Mail Config
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -19,6 +21,7 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 
+# 📬 Email Route
 @app.route("/send", methods=["POST"])
 def send_email():
     data = request.get_json()
@@ -29,13 +32,13 @@ def send_email():
     if not name or not email or not message:
         return jsonify({"status": "error", "message": "Missing fields"}), 400
 
-    # Load and render HTML to PDF
     try:
+        # Load and render the PDF template
         with open("pdf_template.html") as f:
             html_template = f.read()
 
-        html = render_template_string(html_template, name=name, email=email, message=message)
-        pdf = HTML(string=html).write_pdf()
+        rendered_html = render_template_string(html_template, name=name, email=email, message=message)
+        pdf = HTML(string=rendered_html).write_pdf()
 
         msg = Message(subject="New Contact Form Submission",
                       recipients=[os.getenv('MAIL_RECEIVER')])
@@ -48,9 +51,18 @@ def send_email():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# 🏠 Serve Frontend
 @app.route("/")
-def home():
-    return "📬 Contact Form Email Server is running."
+def index():
+    return render_template("index.html")  # Automatically looks in templates/
+
+# Optional: Serve other HTML pages
+@app.route("/<page>")
+def static_page(page):
+    try:
+        return render_template(page)
+    except:
+        return "404 Page Not Found", 404
 
 if __name__ == "__main__":
     app.run(debug=True)
