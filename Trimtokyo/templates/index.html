@@ -87,6 +87,8 @@
   }
 </style>
 
+{% endraw %}
+
 <section class="px-6 py-8">
   <h2 class="text-xl font-semibold mb-4 text-gray-700">Our Services</h2>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -152,9 +154,7 @@
     index = (index + 1) % totalSlides;
     track.style.transform = `translateX(-${index * 100}%)`;
   }, 4000);
-</script>
 
-<script>
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       const bookingsContainer = document.querySelector("#bookings-container");
@@ -169,3 +169,15 @@
           bookingsContainer.innerHTML = "<p>No bookings found.</p>";
         } else {
           snapshot.forEach((doc) => {
+            bookingsContainer.innerHTML += `<p>${JSON.stringify(doc.data())}</p>`;
+          });
+        }
+      } catch (error) {
+        bookingsContainer.innerHTML = "<p>Error loading bookings.</p>";
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
