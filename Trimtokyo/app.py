@@ -1,17 +1,17 @@
 import os
-from flask import Flask, request, render_template, render_template_string, jsonify
+from flask import Flask, render_template, request, jsonify, render_template_string
 from flask_mail import Mail, Message
+from flask_cors import CORS
 from dotenv import load_dotenv
 from weasyprint import HTML
-from flask_cors import CORS
 
 # Load environment variables
 load_dotenv("config.env")
 
-app = Flask(__name__, static_folder='static', template_folder='templates')
-CORS(app)  # Optional: Allow cross-origin requests
+app = Flask(__name__)
+CORS(app)
 
-# Flask-Mail Config
+# Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -21,7 +21,12 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 
-# 📬 Email Route
+# Home route
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+# Contact form POST handler
 @app.route("/send", methods=["POST"])
 def send_email():
     data = request.get_json()
@@ -33,12 +38,11 @@ def send_email():
         return jsonify({"status": "error", "message": "Missing fields"}), 400
 
     try:
-        # Load and render the PDF template
         with open("pdf_template.html") as f:
             html_template = f.read()
 
-        rendered_html = render_template_string(html_template, name=name, email=email, message=message)
-        pdf = HTML(string=rendered_html).write_pdf()
+        html = render_template_string(html_template, name=name, email=email, message=message)
+        pdf = HTML(string=html).write_pdf()
 
         msg = Message(subject="New Contact Form Submission",
                       recipients=[os.getenv('MAIL_RECEIVER')])
@@ -47,22 +51,48 @@ def send_email():
 
         mail.send(msg)
         return jsonify({"status": "success", "message": "Email sent!"})
-    
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# 🏠 Serve Frontend
-@app.route("/")
-def index():
-    return render_template("index.html")  # Automatically looks in templates/
+# Register page
+@app.route("/register")
+def register():
+    return render_template("register.html")
 
-# Optional: Serve other HTML pages
-@app.route("/<page>")
-def static_page(page):
-    try:
-        return render_template(page)
-    except:
-        return "404 Page Not Found", 404
+# Login page
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+# Services page
+@app.route("/services")
+def services():
+    return render_template("services.html")
+
+# Contact page
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+# Admin dashboard (optional if used)
+@app.route("/admin")
+def admin():
+    return render_template("admin_dashboard.html")
+
+# User dashboard (optional if used)
+@app.route("/user")
+def user():
+    return render_template("user_dashboard.html")
+
+# Barber dashboard (optional if used)
+@app.route("/barber")
+def barber():
+    return render_template("barber_dashboard.html")
+
+# Health check
+@app.route("/ping")
+def ping():
+    return "✅ App is running!"
 
 if __name__ == "__main__":
     app.run(debug=True)
